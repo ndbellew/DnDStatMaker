@@ -6,13 +6,15 @@ import sys
 class StatMaker:
 
     def __init__(self, _STR, _DEX, _CON, _INT, _WIS, _CHA):
-        self.S = _STR
-        self.D = _DEX
-        self.C = _CON
-        self.I = _INT
-        self.W = _WIS
-        self.CH = _CHA
+        self.S = int(_STR)
+        self.D = int(_DEX)
+        self.C = int(_CON)
+        self.I = int(_INT)
+        self.W = int(_WIS)
+        self.CH = int(_CHA)
         self.count = 0
+        self.STR,self.DEX,self.CON,self.INT,self.WIS,self.CHA = 0,0,0,0,0,0
+        self.total = 0
         self.GrandTotalCount = 0
 
     def RandInt(self,Min):
@@ -22,37 +24,50 @@ class StatMaker:
             self.count +=1
         return Num
     def SetStats(self):
-        STR=self.RandInt(self.S)
-        DEX=self.RandInt(self.D)
-        CON=self.RandInt(self.C)
-        INT=self.RandInt(self.I)
-        WIS=self.RandInt(self.W)
-        CHA=self.RandInt(self.CH)
-        return STR,DEX,CON,INT,WIS,CHA
+        self.STR=self.RandInt(self.S)
+        self.DEX=self.RandInt(self.D)
+        self.CON=self.RandInt(self.C)
+        self.INT=self.RandInt(self.I)
+        self.WIS=self.RandInt(self.W)
+        self.CHA=self.RandInt(self.CH)
+    
+    def CleanData(self):
+        self.STR,self.DEX,self.CON,self.INT,self.WIS,self.CHA = list(map(int, [self.STR,self.DEX,self.CON,self.INT,self.WIS,self.CHA]))
 
     def DetermineStats(self):
-        total = 0
+        self.total = 0
         if len(sys.argv) > 1:
             num = int(sys.argv[1])
         else:
             num = 70
-        while (total<num):
-            STR,DEX,CON,INT,WIS,CHA = self.SetStats()
-            total = int(math.fsum([STR,DEX,CON,INT,WIS,CHA]))
-        return total, STR, DEX, CON, INT, WIS, CHA
+        while (self.total<num):
+            self.SetStats()
+            self.total = int(math.fsum([self.STR,self.DEX,self.CON,self.INT,self.WIS,self.CHA]))
+        return self.total, self.STR,self.DEX,self.CON,self.INT,self.WIS,self.CHA
 
-    def PrintStats(self,total, STR,DEX,CON,INT,WIS,CHA):
+    def getStatList(self):
+        return self.STR,self.DEX,self.CON,self.INT,self.WIS,self.CHA
+
+    def getStats(self):
+        x = f"""STR: {self.STR},\nDEX: {self.DEX}\nCON:{self.CON}\nINT: {self.INT},\nWIS: {self.WIS},\nCHA: {self.CHA},\nTotal: {self.total}
+                \nTotal Rolls: {self.count}\nGrand Total Rolls: {self.GrandTotalCount}
+            """
+        return x
+
+    def PrintStats(self):
         print("______________")
-        print("STR: ",STR,"\nDEX: ",DEX,"\nCON: ",CON,"\nINT: ",INT,"\nWIS: ",WIS,"\nCHA: ",CHA,"\nTotal: ",total)
+        print("STR: ",self.STR,"\nDEX: ",self.DEX,"\nCON: ",self.CON,"\nINT: ",self.INT,"\nWIS: ",self.WIS,"\nCHA: ",self.CHA,"\nTotal: ",self.total)
         print("Total Rolls to get score: ",self.count)
         print("Grand Total Rolls this session: ", self.GrandTotalCount)
         print("______________")
 
     def run(self):
-        total, STR,DEX,CON,INT,WIS,CHA = self.DetermineStats()
+        self.CleanData()
+        self.DetermineStats()
         self.GrandTotalCount += self.count
-        self.PrintStats(total, STR,DEX,CON,INT,WIS,CHA)
+        #self.PrintStats()
         self.count = 0
+        return self.getStatList()
 
 def splitvars(line):
     for x in line.split():
